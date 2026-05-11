@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <title>Miemiefur Colour Matcher</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+	font-family: system-ui, -apple-system, sans-serif;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 20px;
+	padding-bottom: 80px;
+	background: #1a1a2e;
+	color: #eee;
+	text-align: center;
+    }
+
+    a {
+      color: #7bd88f;
+      }
+
+    h1 {
+      color: #2ecc71; 
+      font-family: "Roboto Condensed", system-ui, sans-serif;
+      text-align: center;
+      margin-bottom: 10px;
+      font-weight: 300;
+      font-size: 2rem;
+    }
+    .subtitle {
+      text-align: center;
+      opacity: 0.7;
+      margin-bottom: 30px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 30px;
+  align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .container { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+	.panel.image-area {
+	  align-self: start;
+	}
+
+    .image-area {
+      position: relative;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+    }
+
+	.shop-dock {
+	  margin-top: 15px;
+	  padding: 10px;
+	  border-radius: 12px;
+	  background: rgba(255,255,255,0.04);
+	  border: 1px solid rgba(255,255,255,0.08);
+	  text-align: center;
+	}
+
+	.shop-title {
+	  font-size: 19px;
+	  margin-bottom: 15px;
+	}
+
+	.shop-links {
+	  display: flex;
+	  justify-content: center;
+	  gap: 8px;
+	}
+
+	.shop-links a {
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  text-decoration: none;
+	  font-size: 15px;
+	  background: rgba(0,0,0,0.5);
+	  border: 1px solid rgba(255,255,255,0.12);
+	  border-radius: 10px;
+	  transition: 0.2s;
+	  padding: 10px;
+	}
+
+	.shop-links a:hover {
+	  transform: translateY(-2px) scale(1.05);
+	  background: rgba(255,255,255,0.1);
+	}
+
+    .support-banner {
+	  position: fixed;
+	  bottom: 0;
+	  left: 0;
+	  width: 100%;
+	  background: #0f0f23;
+	  border-top: 1px solid #4a5568;
+	  color: #eee;
+	  text-align: center;
+	  padding: 12px;
+	  font-size: 14px;
+	  z-index: 9999;
+	}
+
+    #dropZone {
+      border: 2px dashed rgba(255,255,255,0.3);
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    #dropZone:hover, #dropZone.dragover {
+      border-color: #e94560;
+      background: rgba(233, 69, 96, 0.1);
+    }
+
+    #dropZone.hidden { display: none; }
+    #canvas {
+      max-width: 100%;
+      border-radius: 12px;
+      cursor: crosshair;
+    }
+
+	#canvas.hidden { display: none; }
+
+	#clearSavedBtn {
+	  background: #e94560;
+	}
+
+	#clearSavedBtn:hover {
+	  background: #c72e47;
+	}
+
+	#exportSavedBtn {
+	  background: #1697e0;
+	}
+
+	#exportSavedBtn:hover {
+	  background: #1287c9;
+	}
+
+	#magnifier {
+	  position: absolute;
+	  width: 120px;
+	  height: 120px;
+	  border-radius: 50%;
+	  border: 2px solid rgba(255,255,255,0.6);
+	  pointer-events: none;
+	  display: none;
+	  overflow: hidden;
+	  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+	  transform: translate(-50%, -50%);
+	  background: #000;
+	}
+
+    .reset-btn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #e94560;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+	transition: 0.2s;
+	font-family: system-ui, -apple-system, sans-serif;
+	font-weight: 400;
+	font-size: 16px;
+    }
+
+    .reset-btn:hover { background: #c72e47; }
+    .reset-btn.hidden { display: none; }
+    .results h2 {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      font-weight: 400;
+    }
+
+    .color-display {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .color-box {
+      flex: 1;
+      text-align: center;
+    }
+
+    .color-box label {
+      display: block;
+      font-size: 12px;
+      opacity: 0.7;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .swatch {
+      width: 100%;
+      height: 80px;
+      border-radius: 12px;
+      border: 3px solid rgba(255,255,255,0.2);
+      transition: all 0.3s;
+    }
+
+	.swatch-box {
+	  position: relative;
+	}
+
+	.star-btn {
+	  position: absolute;
+	  top: 6px;
+	  right: 6px;
+	  background: rgba(0,0,0,0.5);
+	  border: none;
+	  border-radius: 6px;
+	  cursor: pointer;
+	  font-size: 14px;
+	  padding: 4px;
+	  color: gold;
+	  transition: 0.2s;
+	}
+
+	.star-btn:hover {
+	  background: rgba(0,0,0,0.8);
+	  transform: scale(1.1);
+	}
+
+    .color-info {
+	margin-top: 10px;
+	font-size: 13px;
+	font-family: monospace;
+	white-space: pre-line;
+    }
+
+	/* distance mode toggle */
+	.modeToggle{
+	  display:flex;
+	  justify-content:center;
+	  margin-bottom:18px;
+	}
+
+	.modeToggle button{
+	  background:#1b1b1b;
+	  border:1px solid #333;
+	  color:#aaa;
+	  padding:6px 16px;
+	  font-size:12px;
+	  cursor:pointer;
+	  transition:.2s;
+	}
+
+	.modeToggle button:first-child{
+	  border-radius:20px 0 0 20px;
+	  border-right:none;
+	}
+
+	.modeToggle button:last-child{
+	  border-radius:0 20px 20px 0;
+	}
+
+	.modeToggle button:hover{
+	  background:#262626;
+	  color:#fff;
+	}
+
+	.modeToggle .active{
+	  background:#00d4ff;
+	  color:#000;
+	  border-color:#00d4ff;
+	}
+
+	.saved-section {
+	  padding: 10px;
+	  text-align: center;
+	}
+
+	.saved-section h3 {
+	  margin-bottom: 10px;
+	}
+
+	.saved-item {
+	  display: flex;
+	  align-items: center;
+	  gap: 10px;
+	  padding: 6px;
+	  margin-top: 6px;
+	  border-radius: 8px;
+	  background: rgba(255,255,255,0.04);
+	  cursor: pointer;
+	  transition: 0.2s;
+	  will-change: transform;
+	  position: relative;
+	}
+
+	.saved-item:hover {
+	  background: rgba(255,255,255,0.08);
+	}
+
+	.saved-item.drag-over {
+	  background: rgba(0, 212, 255, 0.15);
+	  border: 1px dashed #00d4ff;
+	  transform: scale(1.02);
+	}
+
+	.saved-item.dragging {
+	  opacity: 0.5;
+	}
+
+	.saved-item.drop-above::before,
+	.saved-item.drop-below::before {
+	  content: "";
+	  position: absolute;
+	  left: 6px;
+	  right: 6px;
+	  height: 2px;
+	  background: #00d4ff;
+	  border-radius: 2px;
+	}
+
+	.saved-item.drop-above::before {
+	  top: 0;
+	}
+
+	.saved-item.drop-below::before {
+	  bottom: 0;
+	}
+
+	.saved-swatch {
+	  width: 26px;
+	  height: 26px;
+	  border-radius: 6px;
+	  border: 1px solid rgba(255,255,255,0.2);
+	}
+
+	/*delete button for each saved colour*/
+	.delete-btn {
+	  background: transparent;
+	  border: none;
+	  color: #ff6b6b;
+	  font-size: 16px;
+	  cursor: pointer;
+	  padding: 4px 8px;
+	  border-radius: 6px;
+	  transition: 0.2s;
+	}
+
+	.delete-btn:hover {
+	  background: rgba(255, 107, 107, 0.15);
+	}
+
+	/*buttons for clear all and export*/
+	.secondary-btn {
+	  width: 100%;
+	  margin-top: 4px;
+	  padding: 6px 10px;
+	  border-radius: 8px;
+	  border: none;
+	  background: #3a3a3a;
+	  color: white;
+	  cursor: pointer;
+	  font-family: system-ui, -apple-system, sans-serif;
+	  font-weight: 400;
+	  font-size: 16px;
+	  transition: 0.2s;
+	}
+
+	.toast {
+	  position: fixed;
+	  bottom: 90px;
+	  left: 50%;
+	  transform: translateX(-50%);
+	  background: rgba(0,0,0,0.85);
+	  color: white;
+	  padding: 10px 16px;
+	  border-radius: 10px;
+	  font-size: 13px;
+	  opacity: 0;
+	  pointer-events: none;
+	  transition: opacity 0.25s ease, transform 0.25s ease;
+	  z-index: 99999;
+	}
+
+	.toast.show {
+	  opacity: 1;
+	  transform: translateX(-50%) translateY(-6px);
+	}
+
+  </style>
+</head>
+<body>
+  <h1>🐉Miemiefur Colour Matcher v1🐉</h1>
+  <p class="subtitle">Upload a reference sheet and click to find the closest fabric match</p>
+
+  <div class="container">
+    <div class="panel image-area">
+      <div id="dropZone">
+        <p style="font-size: 48px; margin-bottom: 15px;">📁</p>
+        <p>Drop your reference image here<br>or <strong>click to browse</strong></p>
+      </div>
+
+      <canvas id="canvas" class="hidden"></canvas>
+	<canvas id="magnifier"></canvas>
+      <button id="resetBtn" class="reset-btn hidden">↻ Load Different Image</button>
+      <input type="file" id="fileInput" accept="image/*" style="display:none">
+
+	<div class="shop-dock">
+  				<div class="shop-title">Miemiefur Purchase Links (By Colour Group)</div>
+
+	  <div class="shop-links">
+	   <a href="https://www.aliexpress.com/item/1005007444834225.html" target="_blank">⚫<br>Blacks, Grey, Whites</a>
+	   <a href="https://www.aliexpress.com/item/1005007450129612.html" target="_blank">🟤<br>Browns, Tans</a>
+	   <a href="https://www.aliexpress.com/item/1005007450222285.html" target="_blank">🔴<br>Reds, Pinks</a>
+	   <a href="https://www.aliexpress.com/item/1005007450307177.html" target="_blank">🟡<br>Oranges, Yellows</a>
+	   <a href="https://www.aliexpress.com/item/1005007450310320.html" target="_blank">🟢<br>Greens</a>
+	   <a href="https://www.aliexpress.com/item/1005007450076767.html" target="_blank">🔵<br>Blues</a>
+   	   <a href="https://www.aliexpress.com/item/1005007450261467.html" target="_blank">🟣<br>Purples</a>
+	   </div>
+	</div>
+
+    </div>
+
+    <div class="panel results">
+      <h2>Colour Match</h2>
+
+	<!-- Mode Toggle -->
+	<div class="modeToggle">
+	     <button id="rgbBtn">RGB</button>
+	   <button id="labBtn" class="active">LAB</button>
+	</div>
+	
+	<!-- Language Toggle -->
+	<div class="modeToggle">
+	  <button id="enBtn" class="active">EN</button>
+	  <button id="cnBtn">中文</button>
+	</div>
+      
+      <div class="color-display">
+        <div class="color-box">
+          <label>Picked</label>
+          <div id="pickedSwatch" class="swatch" style="background: #444"></div>
+          <div id="pickedInfo" class="color-info">Click anywhere on image to pick a colour</div>
+        </div>
+
+	<div class="color-box">
+	  <label>Closest Match</label>
+	  <div class="swatch-box">
+	    <div id="matchSwatch" class="swatch" style="background: #444"></div>
+	    <button class="star-btn" data-target="match">⭐</button>
+	  </div>
+	  <div id="matchInfo" class="color-info">—</div>
+	</div>
+
+      </div>
+
+	<div id="runnerUps" style="margin-bottom:20px;">
+	  <h3 style="font-size:13px; opacity:.7; margin-bottom:10px;">OTHER MATCHES</h3>
+	
+	  <div style="display:flex; gap:12px;">
+	    <div style="flex:1; text-align:center;">
+		<div class="swatch-box">
+		  <div id="runner1Swatch" class="swatch" style="height:60px;"></div>
+		  <button class="star-btn" data-target="r1">⭐</button>
+		</div>
+	      <div id="runner1Info" class="color-info">—</div>
+	    </div>
+	
+	    <div style="flex:1; text-align:center;">
+		<div class="swatch-box">
+		  <div id="runner2Swatch" class="swatch" style="height:60px;"></div>
+		  <button class="star-btn" data-target="r2">⭐</button>
+		</div>
+	      <div id="runner2Info" class="color-info">—</div>
+	    </div>
+	  </div>
+</div>
+
+	<hr class="divider">
+
+	<div class="saved-section">
+	  <h3>Saved Fur Colours</h3>
+
+	  <button id="clearSavedBtn" class="secondary-btn" style="margin-bottom:10px;">
+		🗑️ Delete All
+	  </button>
+	<button id="exportSavedBtn" class="secondary-btn" style="margin-bottom:10px;">
+	  💾 Export Saved Furs As .txt
+	</button>
+
+	  <div id="savedColours"></div>
+	</div>
+    </div>
+  </div>
+
+<div id="toast" class="toast">Saved ✔</div>
+
+  <script>
+    // Miemiefur colour palette (from colour library)
+    // Format: [name, R, G, B]
+    const MIEMIEFUR_COLOURS = [
+	// White & Black
+	[{ group: "White & Black", en: "Bleach", cn: "漂白" }, 248, 249, 250],
+	[{ group: "White & Black", en: "Pure White", cn: "本白" }, 242, 239, 230],
+	[{ group: "White & Black", en: "Black", cn: "黑色" }, 29, 31, 30],
+	[{ group: "White & Black", en: "Ink", cn: "墨" }, 17, 25, 43],
+	[{ group: "White & Black", en: "Moonstone", cn: "月石" }, 190, 196, 194],
+	[{ group: "White & Black", en: "Slate Gray", cn: "岩灰" }, 162, 160, 155],
+	[{ group: "White & Black", en: "Frost Gray", cn: "霜灰" }, 143, 145, 145],
+	[{ group: "White & Black", en: "Raven Black", cn: "黑鸦灰" }, 117, 116, 115],
+	[{ group: "White & Black", en: "Mori Gray", cn: "森灰" }, 43, 50, 47],
+	[{ group: "White & Black", en: "Bluish Gray", cn: "蓝灰" }, 41, 58, 63],
+	[{ group: "White & Black", en: "Quiet Silver", cn: "锡灰" }, 97, 97, 97],
+
+	// Brown
+	[{ group: "Brown", en: "Wheat Yellow", cn: "麦黄" }, 192, 176, 154],
+	[{ group: "Brown", en: "Earthy Yellow", cn: "黄土" }, 211, 179, 139],
+	[{ group: "Brown", en: "Umber", cn: "棕褐" }, 109, 88, 67],
+	[{ group: "Brown", en: "Chocolate", cn: "热巧" }, 75, 37, 37],
+	[{ group: "Brown", en: "Russet", cn: "赤褐" }, 106, 45, 45],
+	[{ group: "Brown", en: "Driftwood", cn: "海狸棕" }, 144, 110, 93],
+	[{ group: "Brown", en: "Acorn", cn: "橡果" }, 98, 69, 34],
+	[{ group: "Brown", en: "Caramel Latte (COMING SOON)", cn: "糖咖 (COMING SOON)" }, 132, 76, 41],
+
+	// Red & Pink
+	[{ group: "Red & Pink", en: "Peony", cn: "" }, 237, 94, 163],
+	[{ group: "Red & Pink", en: "Lavender", cn: "紫粉" }, 173, 57, 150],
+	[{ group: "Red & Pink", en: "Ibis Feather", cn: "鸨羽" }, 247, 165, 172],
+	[{ group: "Red & Pink", en: "Spinel", cn: "尖晶" }, 212, 27, 104],
+	[{ group: "Red & Pink", en: "Tomato", cn: "茄红" }, 213, 32, 39],
+	[{ group: "Red & Pink", en: "Azuki Haze", cn: "红豆沙" }, 223, 178, 192],
+	[{ group: "Red & Pink", en: "Ballet Slipper", cn: "妃粉" }, 226, 130, 180],
+	[{ group: "Red & Pink", en: "Cashmere Pink", cn: "棉粉" }, 252, 219, 223],
+	[{ group: "Red & Pink", en: "Peach Nectar", cn: "蜜桃粉" }, 248, 183, 173],
+	[{ group: "Red & Pink", en: "Sugar Bloom", cn: "粉泡芙" }, 241, 126, 174],
+	[{ group: "Red & Pink", en: "Merlot", cn: "酱红" }, 177, 99, 92],
+
+	// Orange & Yellow
+	[{ group: "Orange & Yellow", en: "Scarlet", cn: "猩绯" }, 242, 111, 84],
+	[{ group: "Orange & Yellow", en: "Warm", cn: "熏" }, 244, 165, 149],
+	[{ group: "Orange & Yellow", en: "Daylily", cn: "萱草" }, 247, 142, 85],
+	[{ group: "Orange & Yellow", en: "Toasted Almond", cn: "杏褐" }, 244, 149, 82],
+	[{ group: "Orange & Yellow", en: "Sunset", cn: "霞菊" }, 246, 133, 33],
+	[{ group: "Orange & Yellow", en: "Copper Stone", cn: "桔普褐" }, 244, 117, 51],
+	[{ group: "Orange & Yellow", en: "Sugar Orange", cn: "秋橘红" }, 228, 108, 51],
+	[{ group: "Orange & Yellow", en: "Cream", cn: "奶油" }, 255, 244, 218],
+	[{ group: "Orange & Yellow", en: "Sand", cn: "砂" }, 252, 227, 182],
+	[{ group: "Orange & Yellow", en: "Egg Yolk", cn: "蛋黄" }, 255, 226, 161],
+	[{ group: "Orange & Yellow", en: "Daisy", cn: "雏菊" }, 255, 208, 0],
+	[{ group: "Orange & Yellow", en: "Buttercream", cn: "杏仁黄" }, 251, 234, 178],
+	[{ group: "Orange & Yellow", en: "Afterglow", cn: "冬麦" }, 255, 226, 178],
+	[{ group: "Orange & Yellow", en: "Pumpkin", cn: "南瓜" }, 252, 186, 138],
+	[{ group: "Orange & Yellow", en: "Strelitzia", cn: "天堂鸟" }, 245, 131, 86],
+	[{ group: "Orange & Yellow", en: "Coral Bloom", cn: "虾红" }, 242, 111, 55],
+	[{ group: "Orange & Yellow", en: "Mascarpone Glow (COMING SOON)", cn: "芝士黄 (COMING SOON)" }, 238, 228, 157],
+
+	// Green
+	[{ group: "Green", en: "Honey Dew", cn: "甜瓜" }, 216, 234, 190],
+	[{ group: "Green", en: "Bamboo", cn: "若竹" }, 49, 179, 120],
+	[{ group: "Green", en: "Seafoam", cn: "浪里" }, 0, 135, 100],
+	[{ group: "Green", en: "Teal", cn: "青栈" }, 173, 221, 210],
+	[{ group: "Green", en: "Fir", cn: "杉" }, 138, 209, 196],
+	[{ group: "Green", en: "Turquoise", cn: "绿松" }, 0, 169, 190],
+	[{ group: "Green", en: "Marsh Green", cn: "沼绿" }, 115, 167, 176],
+	[{ group: "Green", en: "Chlorophyll", cn: "嫩叶" }, 230, 229, 22],
+	[{ group: "Green", en: "Zesty", cn: "油柑" }, 211, 222, 38],
+	[{ group: "Green", en: "Dusty Jade", cn: "水榕" }, 5, 84, 42],
+	[{ group: "Green", en: "Ivy", cn: "典绿" }, 6, 177, 75],
+	[{ group: "Green", en: "Neon Moss", cn: "锐绿" }, 193, 219, 121],
+	[{ group: "Green", en: "Hazy Jade", cn: "云子绿" }, 0, 115, 62],
+	[{ group: "Green", en: "Lichen Haze (COMING SOON)", cn: "苔绿 (COMING SOON)" }, 89, 98, 55],
+	[{ group: "Green", en: "Mung Haze (COMING SOON)", cn: "绿豆沙 (COMING SOON)" }, 186, 195, 148],
+
+	// Blue
+	[{ group: "Blue", en: "Topaz", cn: "托帕" }, 152, 215, 225],
+	[{ group: "Blue", en: "Pale Blue", cn: "淡蓝" }, 161, 220, 235],
+	[{ group: "Blue", en: "Azure", cn: "天青" }, 104, 204, 229],
+	[{ group: "Blue", en: "Wave Ride", cn: "千草" }, 17, 181, 215],
+	[{ group: "Blue", en: "Tiles", cn: "瓦青" }, 0, 143, 202],
+	[{ group: "Blue", en: "Cyan", cn: "氰蓝" }, 20, 106, 180],
+	[{ group: "Blue", en: "Lapis Lazuli", cn: "青金石" }, 21, 83, 165],
+	[{ group: "Blue", en: "Midnight Blue", cn: "夜蓝" }, 28, 55, 93],
+	[{ group: "Blue", en: "Indigo", cn: "渡蓝" }, 31, 67, 136],
+	[{ group: "Blue", en: "Amparo Blue", cn: "帕罗蓝" }, 58, 98, 174],
+	[{ group: "Blue", en: "Aqua Gleam", cn: "海蓝" }, 145, 214, 221],
+	[{ group: "Blue", en: "Horizon Blue", cn: "路蓝" }, 189, 210, 233],
+	[{ group: "Blue", en: "Sapphire Smoke", cn: "蓝石" }, 121, 150, 191],
+	[{ group: "Blue", en: "Serene Blue (COMING SOON)", cn: "谧蓝 (COMING SOON)" }, 114, 133, 165],
+	[{ group: "Blue", en: "Cloud Haze (COMING SOON)", cn: "雾灰 (COMING SOON)" }, 162, 173, 175],
+
+	// Purple
+	[{ group: "Purple", en: "Tipsy", cn: "微醺" }, 166, 171, 214],
+	[{ group: "Purple", en: "Hongbi", cn: "红碧" }, 157, 160, 207],
+	[{ group: "Purple", en: "Hibiscus Purple", cn: "槿紫" }, 129, 110, 161],
+	[{ group: "Purple", en: "Rapids", cn: "泷" }, 63, 38, 103],
+	[{ group: "Purple", en: "Iris", cn: "虹膜" }, 161, 99, 169],
+	[{ group: "Purple", en: "Platycodon", cn: "桔梗" }, 73, 58, 150],
+	[{ group: "Purple", en: "Amethyst", cn: "紫晶" }, 87, 40, 112],
+	[{ group: "Purple", en: "Phalaenopsis (COMING SOON)", cn: "蝴蝶兰 (COMING SOON)" }, 219, 157, 254],
+	[{ group: "Purple", en: "Twilight Bloom (COMING SOON)", cn: "暮紫 (COMING SOON)" }, 53, 13, 102],
+    ];
+
+	const MIEMIEFUR_COLOURS_LAB = MIEMIEFUR_COLOURS.map(([meta, r, g, b]) => {
+		return {
+			meta,
+			r,
+			g,
+			b,
+			lab: rgbToLab(r, g, b)
+		};
+	});
+
+	const groupLabelMap = {
+	"White & Black": "White & Black",
+	"Brown": "Browns",
+	"Red & Pink": "Reds & Pinks",
+	"Orange & Yellow": "Oranges & Yellows",
+	"Green": "Greens",
+	"Blue": "Blues",
+	"Purple": "Purples"
+	};
+
+	const groupEmojiMap = {
+	  "White & Black": "⚪",
+	  "Brown": "🟤",
+	  "Red & Pink": "🔴",
+	  "Orange & Yellow": "🟡",
+	  "Green": "🟢",
+	  "Blue": "🔵",
+	  "Purple": "🟣"
+	};
+
+    // DOM elements
+    const dropZone = document.getElementById('dropZone');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const fileInput = document.getElementById('fileInput');
+    const resetBtn = document.getElementById('resetBtn');
+    const pickedSwatch = document.getElementById('pickedSwatch');
+    const pickedInfo = document.getElementById('pickedInfo');
+    const matchSwatch = document.getElementById('matchSwatch');
+    const matchInfo = document.getElementById('matchInfo');
+	const rgbBtn = document.getElementById('rgbBtn');
+	const labBtn = document.getElementById('labBtn');
+	const enBtn = document.getElementById('enBtn');
+	const cnBtn = document.getElementById('cnBtn');
+	const runner1Swatch = document.getElementById('runner1Swatch');
+	const runner1Info = document.getElementById('runner1Info');
+	const runner2Swatch = document.getElementById('runner2Swatch');
+	const runner2Info = document.getElementById('runner2Info');
+	const savedColoursContainer = document.getElementById("savedColours");
+	const clearSavedBtn = document.getElementById("clearSavedBtn");
+	const exportSavedBtn = document.getElementById("exportSavedBtn");
+	const toast = document.getElementById("toast");
+
+	// Pick colour from canvas (ONLY ONCE)
+	canvas.addEventListener('click', (e) => {
+	  const rect = canvas.getBoundingClientRect();
+	
+	  const scaleX = canvas.width / rect.width;
+	  const scaleY = canvas.height / rect.height;
+	
+	  const x = Math.floor((e.clientX - rect.left) * scaleX);
+	  const y = Math.floor((e.clientY - rect.top) * scaleY);
+	
+	  const pixel = ctx.getImageData(x, y, 1, 1).data;
+	  const [r, g, b] = pixel;
+	
+	  pickedSwatch.style.background = rgbToHex(r, g, b);
+	  pickedInfo.textContent = rgbToHex(r, g, b);
+	
+	  matches = findClosest(r, g, b);
+
+	  const match = matches[0];
+	  const runner1 = matches[1];
+	  const runner2 = matches[2];
+
+	  matchSwatch.style.background = rgbToHex(match.r, match.g, match.b);
+	  matchInfo.textContent =
+	    languageMode === "en" ? match.meta.en : match.meta.cn;
+
+	  runner1Swatch.style.background = rgbToHex(runner1.r, runner1.g, runner1.b);
+	  runner1Info.textContent =
+	    languageMode === "en" ? runner1.meta.en : runner1.meta.cn;
+
+	  runner2Swatch.style.background = rgbToHex(runner2.r, runner2.g, runner2.b);
+	  runner2Info.textContent =
+	    languageMode === "en" ? runner2.meta.en : runner2.meta.cn;
+	});
+
+	const magnifier = document.getElementById("magnifier");
+	const magCtx = magnifier.getContext("2d");
+
+	const MAG_SIZE = 120;
+	const ZOOM = 4;
+	const dpr = window.devicePixelRatio || 1;
+
+	// high-res canvas setup
+	magnifier.width = MAG_SIZE * dpr;
+	magnifier.height = MAG_SIZE * dpr;
+	magnifier.style.width = MAG_SIZE + "px";
+	magnifier.style.height = MAG_SIZE + "px";
+
+	magCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+	magCtx.imageSmoothingEnabled = false;
+
+	canvas.addEventListener("mouseenter", () => {
+	  magnifier.style.display = "block";
+	});
+
+	canvas.addEventListener("mouseleave", () => {
+	  magnifier.style.display = "none";
+	});
+
+	canvas.addEventListener("mousemove", (e) => {
+	  const rect = canvas.getBoundingClientRect();
+
+	  const x = (e.clientX - rect.left);
+	  const y = (e.clientY - rect.top);
+
+	  magnifier.style.left = e.clientX + "px";
+	  magnifier.style.top = e.clientY + "px";
+
+	  const size = MAG_SIZE / ZOOM;
+
+	  magCtx.clearRect(0, 0, MAG_SIZE, MAG_SIZE);
+
+	  const img = window.sourceImage;
+	  if (!img) return;
+
+	  //map canvas display → source image pixels
+	  const scaleX = img.width / rect.width;
+	  const scaleY = img.height / rect.height;
+
+	  const sx = (x * scaleX) - (size * scaleX) / 2;
+	  const sy = (y * scaleY) - (size * scaleY) / 2;
+
+	  const sSizeX = size * scaleX;
+	  const sSizeY = size * scaleY;
+
+	  // draw directly from ORIGINAL image (no canvas resampling)
+	  magCtx.imageSmoothingEnabled = false;
+	
+	  magCtx.drawImage(
+	    img,
+	    sx,
+	    sy,
+	    sSizeX,
+	    sSizeY,
+	    0,
+	    0,
+	    MAG_SIZE,
+	    MAG_SIZE
+	  );
+
+	  // ---- RETICLE ----
+	  const cx = MAG_SIZE / 2;
+	  const cy = MAG_SIZE / 2;
+	
+	  magCtx.save();
+	  magCtx.strokeStyle = "rgba(255,255,255,0.9)";
+	  magCtx.lineWidth = 1;
+	
+	  magCtx.beginPath();
+	  magCtx.moveTo(cx, 0);
+	  magCtx.lineTo(cx, MAG_SIZE);
+	  magCtx.moveTo(0, cy);
+	  magCtx.lineTo(MAG_SIZE, cy);
+	  magCtx.stroke();
+
+	  magCtx.beginPath();
+	  magCtx.arc(cx, cy, 2, 0, Math.PI * 2);
+	  magCtx.fillStyle = "rgba(255,255,255,0.9)";
+	  magCtx.fill();
+
+	  magCtx.restore();
+	});
+
+	function showToast(message) {
+	  toast.textContent = message;
+	  toast.classList.add("show");
+	
+	  setTimeout(() => {
+	    toast.classList.remove("show");
+	  }, 1500);
+	}
+
+	let distanceMode = "lab"; // default
+	let languageMode = "en"; // "en" or "cn"
+	let draggedElement = null;
+
+	exportSavedBtn.onclick = () => {
+	  const saved = getSavedColours();
+
+	  if (saved.length === 0) {
+	    alert("No saved colours to export.");
+	    return;
+	  }
+
+	  let text = "Miemiefur Saved Colours\n\n";
+
+		saved.forEach(col => {
+		  const name =
+		    languageMode === "en" ? col.meta.en : col.meta.cn;
+		
+		  const groupLabel =
+		    groupLabelMap[col.meta.group] || col.meta.group;
+		
+		  text += `${name} (Miemiefur ${groupLabel})\n`;
+		});
+
+	  const blob = new Blob([text], { type: "text/plain" });
+	  const url = URL.createObjectURL(blob);
+
+	  const a = document.createElement("a");
+	  a.href = url;
+	  a.download = "miemiefur-colours.txt";
+	  a.click();
+
+	  URL.revokeObjectURL(url);
+	};
+
+	let matches = [];
+
+	// RGB distance (Euclidean) 
+	function colorDistance(r1, g1, b1, r2, g2, b2) {
+ 	 return Math.sqrt(
+ 	   Math.pow(r2 - r1, 2) +
+ 	   Math.pow(g2 - g1, 2) +
+ 	   Math.pow(b2 - b1, 2)
+ 	 );
+	}
+
+
+	//  RGB → LAB conversion 	
+	function rgbToXyz(r, g, b) {
+	  r /= 255; g /= 255; b /= 255;
+
+	  r = r > 0.04045 ? Math.pow((r + 0.055)/1.055, 2.4) : r / 12.92;
+	  g = g > 0.04045 ? Math.pow((g + 0.055)/1.055, 2.4) : g / 12.92;
+	  b = b > 0.04045 ? Math.pow((b + 0.055)/1.055, 2.4) : b / 12.92;
+
+	  let x = r*0.4124 + g*0.3576 + b*0.1805;
+	  let y = r*0.2126 + g*0.7152 + b*0.0722;
+	  let z = r*0.0193 + g*0.1192 + b*0.9505;
+
+	  // scale to D65 range
+	  x *= 100;
+	  y *= 100;
+	  z *= 100;
+
+	  return [x, y, z];
+	}
+
+	function xyzToLab(x, y, z) {
+	  const refX = 95.047;
+	  const refY = 100.000;
+	  const refZ = 108.883;
+
+	  x /= refX;
+	  y /= refY;
+	  z /= refZ;
+
+	  const f = t => t > 0.008856
+	    ? Math.pow(t, 1/3)
+	    : (7.787 * t) + (16/116);
+
+	  const fx = f(x);
+	  const fy = f(y);
+	  const fz = f(z);
+
+	  const L = (116 * fy) - 16;
+	  const A = 500 * (fx - fy);
+	  const B = 200 * (fy - fz);
+
+	  return [L, A, B];
+	}
+
+	function rgbToLab(r,g,b) {
+	  const [x,y,z] = rgbToXyz(r,g,b);
+	  return xyzToLab(x,y,z);
+	}
+
+	function labDistance(r1,g1,b1,r2,g2,b2) {
+	  const [L1,a1,b_1] = rgbToLab(r1,g1,b1);
+	  const [L2,a2,b_2] = rgbToLab(r2,g2,b2);
+
+	  return Math.sqrt(
+	    Math.pow(L1-L2,2) +
+	    Math.pow(a1-a2,2) +
+	    Math.pow(b_1-b_2,2)
+	  );
+	}
+
+	function labDistanceWithPrecomputed(r, g, b, lab2) {
+	  const [L1, a1, b1] = rgbToLab(r, g, b);
+	  const [L2, a2, b2] = lab2;
+		  return Math.sqrt(
+		    (L1 - L2) ** 2 +
+		    (a1 - a2) ** 2 +
+		    (b1 - b2) ** 2
+		  );
+	}
+
+	// Find TOP 3 closest Miemiefur colours
+	function findClosest(r, g, b) {
+	  const results = [];
+	
+	for (const col of MIEMIEFUR_COLOURS_LAB) {
+	  const dist = distanceMode === "lab"
+	    ? labDistanceWithPrecomputed(r, g, b, col.lab)
+	    : colorDistance(r, g, b, col.r, col.g, col.b);
+	
+		  results.push({
+		    meta: col.meta,
+		    r: col.r,
+		    g: col.g,
+		    b: col.b,
+		    distance: dist
+		  });
+	}
+
+	  // sort by distance (smallest first)
+	  results.sort((a, b) => a.distance - b.distance);
+
+	  // return best 3
+	  return results.slice(0, 3);
+	}
+
+    // RGB to Hex
+    function rgbToHex(r, g, b) {
+      return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Handle file load
+	function loadImage(file) {
+	  const img = new Image();
+
+	  img.onload = () => {
+	    window.sourceImage = img;
+
+	    resizeCanvasToFit(img);
+
+	    dropZone.classList.add('hidden');
+	    canvas.classList.remove('hidden');
+	    resetBtn.classList.remove('hidden');
+	  };
+
+	  img.src = URL.createObjectURL(file);
+	}
+
+	function getSavedColours(){
+	  return JSON.parse(localStorage.getItem("miemiefurSaved") || "[]");
+	}
+
+	function setSavedColours(list){
+	  localStorage.setItem("miemiefurSaved", JSON.stringify(list));
+	}
+
+	function renderSavedColours(){
+	const saved = getSavedColours();
+	savedColoursContainer.innerHTML = "";
+
+	saved.forEach((col, index) => {
+		const item = document.createElement("div");
+		item.className = "saved-item";
+		item.draggable = true;
+		item.dataset.id = col.id;
+
+		item.addEventListener("dragstart", (e) => {
+		  e.dataTransfer.setData("text/plain", col.id);
+		  draggedElement = item;
+		  item.classList.add("dragging");
+		});
+
+		item.addEventListener("dragend", () => {
+		  draggedElement = null;
+		  item.classList.remove("dragging");
+
+		  savedColoursContainer.querySelectorAll(".saved-item").forEach(el => {
+		    el.classList.remove("drop-above", "drop-below");
+		  });
+	});
+
+	item.addEventListener("dragover", (e) => {
+	  e.preventDefault();
+
+	  const rect = item.getBoundingClientRect();
+	  const offsetY = e.clientY - rect.top;
+	  const isAbove = offsetY < rect.height / 2;
+
+	  // clear previous indicators
+	savedColoursContainer.querySelectorAll(".saved-item")
+	    .forEach(el => {
+	      el.classList.remove("drop-above", "drop-below");
+	    });
+
+	  if (isAbove) {
+	    item.classList.add("drop-above");
+	  } else {
+	    item.classList.add("drop-below");
+	  }
+	});
+
+	const emoji = groupEmojiMap[col.meta.group] || "";
+	const name = (languageMode === "en" ? col.meta.en : col.meta.cn)
+	  .replace(" (COMING SOON)", "<br>(COMING SOON)");
+
+	item.innerHTML = `
+	  <div class="saved-swatch" style="background:${col.hex}"></div>
+	  <div style="flex:1">
+	    ${name} ${emoji}
+	  </div>
+	  <button class="delete-btn">✕</button>
+	`;
+
+	    // load colour on click (except delete button)
+	    item.addEventListener("click", (e) => {
+	      if (e.target.classList.contains("delete-btn")) return;
+	
+		matchSwatch.style.background = col.hex;
+		matchInfo.textContent = `RGB(${col.r}, ${col.g}, ${col.b})`;
+	    });
+
+	    // delete handler
+	item.querySelector(".delete-btn").onclick = (e) => {
+	  e.stopPropagation();
+
+	  const updated = getSavedColours().filter(c => c.id !== col.id);
+	  setSavedColours(updated);
+	  renderSavedColours();
+	};
+	
+	    savedColoursContainer.appendChild(item);
+	  });
+	}
+
+	clearSavedBtn.onclick = () => {
+	  const saved = getSavedColours();
+
+	  if (saved.length === 0) return;
+
+	  const confirmClear = confirm(
+	    "Are you sure you want to delete all saved colours?"
+	  );
+
+	  if (!confirmClear) return;
+
+	  localStorage.removeItem("miemiefurSaved");
+	  renderSavedColours();
+	};
+
+    // File input handlers
+    dropZone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files[0]) loadImage(e.target.files[0]);
+    });
+
+    // Drag and drop
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files[0]) loadImage(e.dataTransfer.files[0]);
+    });
+
+
+
+    // Reset button
+    resetBtn.addEventListener('click', () => {
+      canvas.classList.add('hidden');
+      resetBtn.classList.add('hidden');
+      dropZone.classList.remove('hidden');
+      fileInput.value = '';
+    });
+
+	function setMode(mode){
+	
+	  distanceMode = mode;
+
+	  rgbBtn.classList.toggle("active", mode === "rgb");
+	  labBtn.classList.toggle("active", mode === "lab");
+	}
+
+	function resizeCanvasToFit(img) {
+	  const maxW = document.querySelector(".image-area").clientWidth;
+	  const maxH = 500;
+	
+	  const w = img.width;
+	  const h = img.height;
+	
+	  const scale = Math.min(maxW / w, maxH / h, 1);
+	
+	  const displayWidth = Math.floor(w * scale);
+	  const displayHeight = Math.floor(h * scale);
+
+	  canvas._displayWidth = displayWidth;
+	  canvas._displayHeight = displayHeight;
+
+	  canvas.width = displayWidth;
+	  canvas.height = displayHeight;
+
+	  canvas.style.width = displayWidth + "px";
+	  canvas.style.height = displayHeight + "px";
+
+	  ctx.setTransform(1, 0, 0, 1, 0, 0);
+	  ctx.imageSmoothingEnabled = true;
+	
+	  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+	  ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
+	}
+
+	function setLanguage(mode){
+	  languageMode = mode;
+
+	  enBtn.classList.toggle("active", mode === "en");
+	  cnBtn.classList.toggle("active", mode === "cn");
+
+	  renderSavedColours();
+	}
+
+	rgbBtn.onclick = () => setMode("rgb");
+	labBtn.onclick = () => setMode("lab");
+	enBtn.onclick = () => setLanguage("en");
+	cnBtn.onclick = () => setLanguage("cn");
+
+	renderSavedColours();
+
+	document.addEventListener("click", (e) => {
+	  const btn = e.target.closest(".star-btn");
+	  if (!btn) return;
+	
+	if (!matches || matches.length === 0) {
+	  showToast("Click image first to generate matches");
+	  return;
+	}
+
+	let col;
+
+	if (btn.dataset.target === "match") col = matches?.[0];
+	if (btn.dataset.target === "r1") col = matches?.[1];
+	if (btn.dataset.target === "r2") col = matches?.[2];
+
+	if (!col) {
+	  showToast("No colour found");
+	  return;
+	}
+
+	  const saved = getSavedColours();
+
+	  const id = col.meta.en;
+
+	  if (saved.some(c => c.id === id)) return;
+
+	  saved.unshift({
+	    id,
+	    meta: col.meta,
+	    r: col.r,
+	    g: col.g,
+	    b: col.b,
+	    hex: rgbToHex(col.r, col.g, col.b)
+	  });
+
+	  if (saved.length > 30) saved.pop();
+
+	  setSavedColours(saved);
+	  renderSavedColours();
+
+		const name =
+		  languageMode === "en" ? col.meta.en : col.meta.cn;
+		showToast(`Saved ${name} ✔`);
+	});
+
+	savedColoursContainer.addEventListener("dragover", (e) => {
+	  e.preventDefault();
+	});
+
+	savedColoursContainer.addEventListener("drop", (e) => {
+	  e.preventDefault();
+	
+	  const draggedId = e.dataTransfer.getData("text/plain");
+	  const saved = getSavedColours();
+	
+	  const fromIndex = saved.findIndex(c => c.id === draggedId);
+	  if (fromIndex === -1) return;
+	
+	  const targetEl = e.target.closest(".saved-item");
+	  if (!targetEl) return;
+	
+	  const toId = targetEl.dataset.id;
+	  const toIndex = saved.findIndex(c => c.id === toId);
+	
+	  if (toIndex === -1 || fromIndex === toIndex) return;
+	
+	  const [moved] = saved.splice(fromIndex, 1);
+	  saved.splice(toIndex, 0, moved);
+	
+	  setSavedColours(saved);
+	  renderSavedColours();
+	});
+
+	window.addEventListener("resize", () => {
+	  if (!window.sourceImage) return;
+
+	  requestAnimationFrame(() => {
+	    resizeCanvasToFit(window.sourceImage);
+	  });
+});
+
+  </script>
+
+	<!-- Support Banner -->
+	<div class="support-banner">
+	  Like this tool? Follow <a href="https://pseudocanid.com/" target ="blank">PseudoCanid</a> on
+	  <i class="fa-brands fa-instagram"></i>
+	<a href="https://instagram.com/pseudocanid" target="_blank" rel="noopener noreferrer">Instagram</a> or
+	  <i class="fa-brands fa-x-twitter"></i> <a href="https://twitter.com/pseudocanid" target="_blank" 	rel="noopener noreferrer">Twitter</a>
+	</div>
+
+</body>
+</html>
