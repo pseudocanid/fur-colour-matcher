@@ -850,12 +850,11 @@
 		}
 
 		const cols = 3;
-		const size = 200;
-		const textHeight = 40;
+		const size = 500;
+		const textHeight = 80;
 
 		const rows = Math.ceil(saved.length / cols);
 
-		// IMPORTANT: separate export canvas
 		const exportCanvas = document.createElement("canvas");
 		const ctx = exportCanvas.getContext("2d");
 
@@ -866,7 +865,6 @@
 		ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
 
 		ctx.textAlign = "center";
-		ctx.font = "14px system-ui";
 		ctx.fillStyle = "#fff";
 
 		const loadImage = (src) =>
@@ -891,12 +889,12 @@
 			const group = groupLabelMap[col.meta.group] || col.meta.group;
 
 			// main title (fur colour)
-			ctx.font = "14px system-ui";
-			ctx.fillText(name, x + size / 2, y + size + 18);
+			ctx.font = "30px system-ui";
+			ctx.fillText(name, x + size / 2, y + size + 40);
 
 			// category (ex. greens)
-			ctx.font = "10px system-ui";
-			ctx.fillText(`Miemiefur ${group}`, x + size / 2, y + size + 34);
+			ctx.font = "15px system-ui";
+			ctx.fillText(`Miemiefur ${group}`, x + size / 2, y + size + 60);
 		}
 
 		exportCanvas.toBlob((blob) => {
