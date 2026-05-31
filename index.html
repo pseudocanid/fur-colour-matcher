@@ -529,7 +529,7 @@
 		🗑️ Delete All
 	  </button>
 	<button id="exportSavedBtn" class="secondary-btn" style="margin-bottom:10px;">
-	  💾 Export Saved Furs As .txt
+	  💾🖼️ Export Saved Colours
 	</button>
 
 	  <div id="savedColours"></div>
@@ -837,35 +837,72 @@
 	let languageMode = "en"; // "en" or "cn"
 	let draggedElement = null;
 
-	exportSavedBtn.onclick = () => {
-	  const saved = getSavedColours();
+	exportSavedBtn.onclick = async () => {
+		const saved = getSavedColours();
 
-	  if (saved.length === 0) {
-	    alert("No saved colours to export.");
-	    return;
-	  }
+		if (!saved.length) {
+			alert("No saved colours to export.");
+			return;
+		}
 
-	  let text = "Miemiefur Saved Colours\n\n";
+		const cols = 3;
+		const size = 200;
+		const textHeight = 40;
 
-		saved.forEach(col => {
-		  const name =
-		    languageMode === "en" ? col.meta.en : col.meta.cn;
-		
-		  const groupLabel =
-		    groupLabelMap[col.meta.group] || col.meta.group;
-		
-		  text += `${name} (Miemiefur ${groupLabel})\n`;
+		const rows = Math.ceil(saved.length / cols);
+
+		// IMPORTANT: separate export canvas
+		const exportCanvas = document.createElement("canvas");
+		const ctx = exportCanvas.getContext("2d");
+
+		exportCanvas.width = cols * size;
+		exportCanvas.height = rows * (size + textHeight);
+
+		ctx.fillStyle = "#1a1a2e";
+		ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+		ctx.textAlign = "center";
+		ctx.font = "14px system-ui";
+		ctx.fillStyle = "#fff";
+
+		const loadImage = (src) =>
+			new Promise((resolve, reject) => {
+			const img = new Image();
+			img.onload = () => resolve(img);
+			img.onerror = reject;
+			img.src = src;
+			});
+
+		for (let i = 0; i < saved.length; i++) {
+			const col = saved[i];
+
+			const img = await loadImage(col.meta.img);
+
+			const x = (i % cols) * size;
+			const y = Math.floor(i / cols) * (size + textHeight);
+
+			ctx.drawImage(img, x, y, size, size);
+
+			const name = languageMode === "en" ? col.meta.en : col.meta.cn;
+			const group = groupLabelMap[col.meta.group] || col.meta.group;
+
+			// main title (fur colour)
+			ctx.font = "14px system-ui";
+			ctx.fillText(name, x + size / 2, y + size + 18);
+
+			// category (ex. greens)
+			ctx.font = "10px system-ui";
+			ctx.fillText(`Miemiefur ${group}`, x + size / 2, y + size + 34);
+		}
+
+		exportCanvas.toBlob((blob) => {
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = "shrinebeasts-fur-colour-matcher.png";
+			a.click();
+			URL.revokeObjectURL(url);
 		});
-
-	  const blob = new Blob([text], { type: "text/plain" });
-	  const url = URL.createObjectURL(blob);
-
-	  const a = document.createElement("a");
-	  a.href = url;
-	  a.download = "miemiefur-colours.txt";
-	  a.click();
-
-	  URL.revokeObjectURL(url);
 	};
 
 	let matches = [];
@@ -1083,20 +1120,20 @@
 	  });
 	}
 
-	clearSavedBtn.onclick = () => {
-	  const saved = getSavedColours();
+		clearSavedBtn.addEventListener("click", () => {
+		const saved = getSavedColours();
 
-	  if (saved.length === 0) return;
+		if (saved.length === 0) {
+			showToast("Nothing to delete");
+			return;
+		}
 
-	  const confirmClear = confirm(
-	    "Are you sure you want to delete all saved colours?"
-	  );
+		if (!confirm("Delete ALL saved colours?")) return;
 
-	  if (!confirmClear) return;
-
-	  localStorage.removeItem("miemiefurSaved");
-	  renderSavedColours();
-	};
+		setSavedColours([]);      // 👈 single source of truth
+		renderSavedColours();     // 👈 UI sync
+		showToast("All saved colours cleared ✔");
+		});
 
     // File input handlers
     dropZone.addEventListener('click', () => fileInput.click());
