@@ -258,6 +258,15 @@
 	white-space: pre-line;
     }
 
+	.match-img {
+	  width: 100%;
+	  height: 80px;
+	  object-fit: cover;
+	  border-radius: 12px;
+	  margin-bottom: 6px;
+	  border: 2px solid rgba(255,255,255,0.15);
+	}
+
 	/* distance mode toggle */
 	.modeToggle{
 	  display:flex;
@@ -469,7 +478,8 @@
 
 	<div class="color-box">
 	  <label>Closest Match</label>
-	  <div class="swatch-box">
+	 <div class="swatch-box">
+		<img id="matchImg" class="match-img" />
 	    <div id="matchSwatch" class="swatch" style="background: #444"></div>
 	    <button class="star-btn" data-target="match">⭐</button>
 	  </div>
@@ -483,17 +493,19 @@
 	
 	  <div style="display:flex; gap:12px;">
 	    <div style="flex:1; text-align:center;">
-		<div class="swatch-box">
-		  <div id="runner1Swatch" class="swatch" style="height:60px;"></div>
-		  <button class="star-btn" data-target="r1">⭐</button>
-		</div>
+			<div class="swatch-box">
+				<img id="runner1Img" class="match-img" />
+				<div id="runner1Swatch" class="swatch" style="height:60px;"></div>
+		  		<button class="star-btn" data-target="r1">⭐</button>
+				</div>
 	      <div id="runner1Info" class="color-info">—</div>
 	    </div>
 	
 	    <div style="flex:1; text-align:center;">
 		<div class="swatch-box">
-		  <div id="runner2Swatch" class="swatch" style="height:60px;"></div>
-		  <button class="star-btn" data-target="r2">⭐</button>
+			<img id="runner2Img" class="match-img" />
+			<div id="runner2Swatch" class="swatch" style="height:60px;"></div>
+			<button class="star-btn" data-target="r2">⭐</button>
 		</div>
 	      <div id="runner2Info" class="color-info">—</div>
 	    </div>
@@ -522,107 +534,107 @@
   <script>
     // Miemiefur colour palette (from colour library)
     // Format: [name, R, G, B]
-    const MIEMIEFUR_COLOURS = [
+	const MIEMIEFUR_COLOURS = [
 	// White & Black
-	[{ group: "White & Black", en: "Bleach", cn: "漂白" }, 248, 249, 250],
-	[{ group: "White & Black", en: "Pure White", cn: "本白" }, 242, 239, 230],
-	[{ group: "White & Black", en: "Black", cn: "黑色" }, 29, 31, 30],
-	[{ group: "White & Black", en: "Ink", cn: "墨" }, 17, 25, 43],
-	[{ group: "White & Black", en: "Moonstone", cn: "月石" }, 190, 196, 194],
-	[{ group: "White & Black", en: "Slate Gray", cn: "岩灰" }, 162, 160, 155],
-	[{ group: "White & Black", en: "Frost Gray", cn: "霜灰" }, 143, 145, 145],
-	[{ group: "White & Black", en: "Raven Black", cn: "黑鸦灰" }, 117, 116, 115],
-	[{ group: "White & Black", en: "Mori Gray", cn: "森灰" }, 43, 50, 47],
-	[{ group: "White & Black", en: "Bluish Gray", cn: "蓝灰" }, 41, 58, 63],
-	[{ group: "White & Black", en: "Quiet Silver", cn: "锡灰" }, 97, 97, 97],
+	[{ group: "White & Black", en: "Bleach", cn: "漂白", img: "miemiefur/bleach.png" }, 248, 249, 250],
+	[{ group: "White & Black", en: "Pure White", cn: "本白", img: "miemiefur/purewhite.png" }, 242, 239, 230],
+	[{ group: "White & Black", en: "Black", cn: "黑色", img: "miemiefur/black.png" }, 29, 31, 30],
+	[{ group: "White & Black", en: "Ink", cn: "墨", img: "miemiefur/ink.png" }, 17, 25, 43],
+	[{ group: "White & Black", en: "Moonstone", cn: "月石", img: "miemiefur/moonstone.png" }, 190, 196, 194],
+	[{ group: "White & Black", en: "Slate Gray", cn: "岩灰", img: "miemiefur/slategray.png" }, 162, 160, 155],
+	[{ group: "White & Black", en: "Frost Gray", cn: "霜灰", img: "miemiefur/frostgray.png" }, 143, 145, 145],
+	[{ group: "White & Black", en: "Raven Black", cn: "黑鸦灰", img: "miemiefur/ravenblack.png" }, 117, 116, 115],
+	[{ group: "White & Black", en: "Mori Gray", cn: "森灰", img: "miemiefur/morigray.png" }, 43, 50, 47],
+	[{ group: "White & Black", en: "Bluish Gray", cn: "蓝灰", img: "miemiefur/bluishgray.png" }, 41, 58, 63],
+	[{ group: "White & Black", en: "Quiet Silver", cn: "锡灰", img: "miemiefur/quietsilver.png" }, 97, 97, 97],
+	[{ group: "White & Black", en: "Cloud Haze", cn: "雾灰", img: "miemiefur/cloudhaze.png" }, 162, 173, 175],
 
 	// Brown
-	[{ group: "Brown", en: "Wheat Yellow", cn: "麦黄" }, 192, 176, 154],
-	[{ group: "Brown", en: "Earthy Yellow", cn: "黄土" }, 211, 179, 139],
-	[{ group: "Brown", en: "Umber", cn: "棕褐" }, 109, 88, 67],
-	[{ group: "Brown", en: "Chocolate", cn: "热巧" }, 75, 37, 37],
-	[{ group: "Brown", en: "Russet", cn: "赤褐" }, 106, 45, 45],
-	[{ group: "Brown", en: "Driftwood", cn: "海狸棕" }, 144, 110, 93],
-	[{ group: "Brown", en: "Acorn", cn: "橡果" }, 98, 69, 34],
-	[{ group: "Brown", en: "Caramel Latte (COMING SOON)", cn: "糖咖 (COMING SOON)" }, 132, 76, 41],
+	[{ group: "Brown", en: "Wheat Yellow", cn: "麦黄", img: "miemiefur/wheatyellow.png" }, 192, 176, 154],
+	[{ group: "Brown", en: "Earthy Yellow", cn: "黄土", img: "miemiefur/earthyyellow.png" }, 211, 179, 139],
+	[{ group: "Brown", en: "Umber", cn: "棕褐", img: "miemiefur/umber.png" }, 109, 88, 67],
+	[{ group: "Brown", en: "Chocolate", cn: "热巧", img: "miemiefur/chocolate.png" }, 75, 37, 37],
+	[{ group: "Brown", en: "Russet", cn: "赤褐", img: "miemiefur/russet.png" }, 106, 45, 45],
+	[{ group: "Brown", en: "Driftwood", cn: "海狸棕", img: "miemiefur/driftwood.png" }, 144, 110, 93],
+	[{ group: "Brown", en: "Acorn", cn: "橡果", img: "miemiefur/acorn.png" }, 98, 69, 34],
+	[{ group: "Brown", en: "Caramel Latte", cn: "糖咖", img: "miemiefur/caramellatte.png" }, 132, 76, 41],
 
 	// Red & Pink
-	[{ group: "Red & Pink", en: "Peony", cn: "" }, 237, 94, 163],
-	[{ group: "Red & Pink", en: "Lavender", cn: "紫粉" }, 173, 57, 150],
-	[{ group: "Red & Pink", en: "Ibis Feather", cn: "鸨羽" }, 247, 165, 172],
-	[{ group: "Red & Pink", en: "Spinel", cn: "尖晶" }, 212, 27, 104],
-	[{ group: "Red & Pink", en: "Tomato", cn: "茄红" }, 213, 32, 39],
-	[{ group: "Red & Pink", en: "Azuki Haze", cn: "红豆沙" }, 223, 178, 192],
-	[{ group: "Red & Pink", en: "Ballet Slipper", cn: "妃粉" }, 226, 130, 180],
-	[{ group: "Red & Pink", en: "Cashmere Pink", cn: "棉粉" }, 252, 219, 223],
-	[{ group: "Red & Pink", en: "Peach Nectar", cn: "蜜桃粉" }, 248, 183, 173],
-	[{ group: "Red & Pink", en: "Sugar Bloom", cn: "粉泡芙" }, 241, 126, 174],
-	[{ group: "Red & Pink", en: "Merlot", cn: "酱红" }, 177, 99, 92],
+	[{ group: "Red & Pink", en: "Peony", cn: "", img: "miemiefur/peony.png" }, 237, 94, 163],
+	[{ group: "Red & Pink", en: "Lavender", cn: "紫粉", img: "miemiefur/lavender.png" }, 173, 57, 150],
+	[{ group: "Red & Pink", en: "Ibis Feather", cn: "鸨羽", img: "miemiefur/ibisfeather.png" }, 247, 165, 172],
+	[{ group: "Red & Pink", en: "Spinel", cn: "尖晶", img: "miemiefur/spinel.png" }, 212, 27, 104],
+	[{ group: "Red & Pink", en: "Tomato", cn: "茄红", img: "miemiefur/tomato.png" }, 213, 32, 39],
+	[{ group: "Red & Pink", en: "Azuki Haze", cn: "红豆沙", img: "miemiefur/azukihaze.png" }, 223, 178, 192],
+	[{ group: "Red & Pink", en: "Ballet Slipper", cn: "妃粉", img: "miemiefur/balletslipper.png" }, 226, 130, 180],
+	[{ group: "Red & Pink", en: "Cashmere Pink", cn: "棉粉", img: "miemiefur/cashmerepink.png" }, 252, 219, 223],
+	[{ group: "Red & Pink", en: "Peach Nectar", cn: "蜜桃粉", img: "miemiefur/peachnectar.png" }, 248, 183, 173],
+	[{ group: "Red & Pink", en: "Sugar Bloom", cn: "粉泡芙", img: "miemiefur/sugarbloom.png" }, 241, 126, 174],
+	[{ group: "Red & Pink", en: "Merlot", cn: "酱红", img: "miemiefur/merlot.png" }, 177, 99, 92],
 
 	// Orange & Yellow
-	[{ group: "Orange & Yellow", en: "Scarlet", cn: "猩绯" }, 242, 111, 84],
-	[{ group: "Orange & Yellow", en: "Warm", cn: "熏" }, 244, 165, 149],
-	[{ group: "Orange & Yellow", en: "Daylily", cn: "萱草" }, 247, 142, 85],
-	[{ group: "Orange & Yellow", en: "Toasted Almond", cn: "杏褐" }, 244, 149, 82],
-	[{ group: "Orange & Yellow", en: "Sunset", cn: "霞菊" }, 246, 133, 33],
-	[{ group: "Orange & Yellow", en: "Copper Stone", cn: "桔普褐" }, 244, 117, 51],
-	[{ group: "Orange & Yellow", en: "Sugar Orange", cn: "秋橘红" }, 228, 108, 51],
-	[{ group: "Orange & Yellow", en: "Cream", cn: "奶油" }, 255, 244, 218],
-	[{ group: "Orange & Yellow", en: "Sand", cn: "砂" }, 252, 227, 182],
-	[{ group: "Orange & Yellow", en: "Egg Yolk", cn: "蛋黄" }, 255, 226, 161],
-	[{ group: "Orange & Yellow", en: "Daisy", cn: "雏菊" }, 255, 208, 0],
-	[{ group: "Orange & Yellow", en: "Buttercream", cn: "杏仁黄" }, 251, 234, 178],
-	[{ group: "Orange & Yellow", en: "Afterglow", cn: "冬麦" }, 255, 226, 178],
-	[{ group: "Orange & Yellow", en: "Pumpkin", cn: "南瓜" }, 252, 186, 138],
-	[{ group: "Orange & Yellow", en: "Strelitzia", cn: "天堂鸟" }, 245, 131, 86],
-	[{ group: "Orange & Yellow", en: "Coral Bloom", cn: "虾红" }, 242, 111, 55],
-	[{ group: "Orange & Yellow", en: "Mascarpone Glow (COMING SOON)", cn: "芝士黄 (COMING SOON)" }, 238, 228, 157],
+	[{ group: "Orange & Yellow", en: "Scarlet", cn: "猩绯", img: "miemiefur/scarlet.png" }, 242, 111, 84],
+	[{ group: "Orange & Yellow", en: "Warm", cn: "熏", img: "miemiefur/warm.png" }, 244, 165, 149],
+	[{ group: "Orange & Yellow", en: "Daylily", cn: "萱草", img: "miemiefur/daylily.png" }, 247, 142, 85],
+	[{ group: "Orange & Yellow", en: "Toasted Almond", cn: "杏褐", img: "miemiefur/toastedalmond.png" }, 244, 149, 82],
+	[{ group: "Orange & Yellow", en: "Sunset", cn: "霞菊", img: "miemiefur/sunset.png" }, 246, 133, 33],
+	[{ group: "Orange & Yellow", en: "Copper Stone", cn: "桔普褐", img: "miemiefur/copperstone.png" }, 244, 117, 51],
+	[{ group: "Orange & Yellow", en: "Sugar Orange", cn: "秋橘红", img: "miemiefur/sugarorange.png" }, 228, 108, 51],
+	[{ group: "Orange & Yellow", en: "Cream", cn: "奶油", img: "miemiefur/cream.png" }, 255, 244, 218],
+	[{ group: "Orange & Yellow", en: "Sand", cn: "砂", img: "miemiefur/sand.png" }, 252, 227, 182],
+	[{ group: "Orange & Yellow", en: "Egg Yolk", cn: "蛋黄", img: "miemiefur/eggyolk.png" }, 255, 226, 161],
+	[{ group: "Orange & Yellow", en: "Daisy", cn: "雏菊", img: "miemiefur/daisy.png" }, 255, 208, 0],
+	[{ group: "Orange & Yellow", en: "Buttercream", cn: "杏仁黄", img: "miemiefur/buttercream.png" }, 251, 234, 178],
+	[{ group: "Orange & Yellow", en: "Afterglow", cn: "冬麦", img: "miemiefur/afterglow.png" }, 255, 226, 178],
+	[{ group: "Orange & Yellow", en: "Pumpkin", cn: "南瓜", img: "miemiefur/pumpkin.png" }, 252, 186, 138],
+	[{ group: "Orange & Yellow", en: "Strelitzia", cn: "天堂鸟", img: "miemiefur/strelitzia.png" }, 245, 131, 86],
+	[{ group: "Orange & Yellow", en: "Coral Bloom", cn: "虾红", img: "miemiefur/coralbloom.png" }, 242, 111, 55],
+	[{ group: "Orange & Yellow", en: "Mascarpone Glow", cn: "芝士黄", img: "miemiefur/mascarponeglow.png" }, 238, 228, 157],
 
 	// Green
-	[{ group: "Green", en: "Honey Dew", cn: "甜瓜" }, 216, 234, 190],
-	[{ group: "Green", en: "Bamboo", cn: "若竹" }, 49, 179, 120],
-	[{ group: "Green", en: "Seafoam", cn: "浪里" }, 0, 135, 100],
-	[{ group: "Green", en: "Teal", cn: "青栈" }, 173, 221, 210],
-	[{ group: "Green", en: "Fir", cn: "杉" }, 138, 209, 196],
-	[{ group: "Green", en: "Turquoise", cn: "绿松" }, 0, 169, 190],
-	[{ group: "Green", en: "Marsh Green", cn: "沼绿" }, 115, 167, 176],
-	[{ group: "Green", en: "Chlorophyll", cn: "嫩叶" }, 230, 229, 22],
-	[{ group: "Green", en: "Zesty", cn: "油柑" }, 211, 222, 38],
-	[{ group: "Green", en: "Dusty Jade", cn: "水榕" }, 5, 84, 42],
-	[{ group: "Green", en: "Ivy", cn: "典绿" }, 6, 177, 75],
-	[{ group: "Green", en: "Neon Moss", cn: "锐绿" }, 193, 219, 121],
-	[{ group: "Green", en: "Hazy Jade", cn: "云子绿" }, 0, 115, 62],
-	[{ group: "Green", en: "Lichen Haze (COMING SOON)", cn: "苔绿 (COMING SOON)" }, 89, 98, 55],
-	[{ group: "Green", en: "Mung Haze (COMING SOON)", cn: "绿豆沙 (COMING SOON)" }, 186, 195, 148],
+	[{ group: "Green", en: "Honey Dew", cn: "甜瓜", img: "miemiefur/honeydew.png" }, 216, 234, 190],
+	[{ group: "Green", en: "Bamboo", cn: "若竹", img: "miemiefur/bamboo.png" }, 49, 179, 120],
+	[{ group: "Green", en: "Seafoam", cn: "浪里", img: "miemiefur/seafoam.png" }, 0, 135, 100],
+	[{ group: "Green", en: "Teal", cn: "青栈", img: "miemiefur/teal.png" }, 173, 221, 210],
+	[{ group: "Green", en: "Fir", cn: "杉", img: "miemiefur/fir.png" }, 138, 209, 196],
+	[{ group: "Green", en: "Turquoise", cn: "绿松", img: "miemiefur/turquoise.png" }, 0, 169, 190],
+	[{ group: "Green", en: "Marsh Green", cn: "沼绿", img: "miemiefur/marshgreen.png" }, 115, 167, 176],
+	[{ group: "Green", en: "Chlorophyll", cn: "嫩叶", img: "miemiefur/chlorophyll.png" }, 230, 229, 22],
+	[{ group: "Green", en: "Zesty", cn: "油柑", img: "miemiefur/zesty.png" }, 211, 222, 38],
+	[{ group: "Green", en: "Dusty Jade", cn: "水榕", img: "miemiefur/dustyjade.png" }, 5, 84, 42],
+	[{ group: "Green", en: "Ivy", cn: "典绿", img: "miemiefur/ivy.png" }, 6, 177, 75],
+	[{ group: "Green", en: "Neon Moss", cn: "锐绿", img: "miemiefur/neonmoss.png" }, 193, 219, 121],
+	[{ group: "Green", en: "Hazy Jade", cn: "云子绿", img: "miemiefur/hazyjade.png" }, 0, 115, 62],
+	[{ group: "Green", en: "Lichen Haze", cn: "苔绿", img: "miemiefur/lichenhaze.png" }, 89, 98, 55],
+	[{ group: "Green", en: "Mung Haze", cn: "绿豆沙", img: "miemiefur/munghaze.png" }, 186, 195, 148],
 
 	// Blue
-	[{ group: "Blue", en: "Topaz", cn: "托帕" }, 152, 215, 225],
-	[{ group: "Blue", en: "Pale Blue", cn: "淡蓝" }, 161, 220, 235],
-	[{ group: "Blue", en: "Azure", cn: "天青" }, 104, 204, 229],
-	[{ group: "Blue", en: "Wave Ride", cn: "千草" }, 17, 181, 215],
-	[{ group: "Blue", en: "Tiles", cn: "瓦青" }, 0, 143, 202],
-	[{ group: "Blue", en: "Cyan", cn: "氰蓝" }, 20, 106, 180],
-	[{ group: "Blue", en: "Lapis Lazuli", cn: "青金石" }, 21, 83, 165],
-	[{ group: "Blue", en: "Midnight Blue", cn: "夜蓝" }, 28, 55, 93],
-	[{ group: "Blue", en: "Indigo", cn: "渡蓝" }, 31, 67, 136],
-	[{ group: "Blue", en: "Amparo Blue", cn: "帕罗蓝" }, 58, 98, 174],
-	[{ group: "Blue", en: "Aqua Gleam", cn: "海蓝" }, 145, 214, 221],
-	[{ group: "Blue", en: "Horizon Blue", cn: "路蓝" }, 189, 210, 233],
-	[{ group: "Blue", en: "Sapphire Smoke", cn: "蓝石" }, 121, 150, 191],
-	[{ group: "Blue", en: "Serene Blue (COMING SOON)", cn: "谧蓝 (COMING SOON)" }, 114, 133, 165],
-	[{ group: "Blue", en: "Cloud Haze (COMING SOON)", cn: "雾灰 (COMING SOON)" }, 162, 173, 175],
+	[{ group: "Blue", en: "Topaz", cn: "托帕", img: "miemiefur/topaz.png" }, 152, 215, 225],
+	[{ group: "Blue", en: "Pale Blue", cn: "淡蓝", img: "miemiefur/paleblue.png" }, 161, 220, 235],
+	[{ group: "Blue", en: "Azure", cn: "天青", img: "miemiefur/azure.png" }, 104, 204, 229],
+	[{ group: "Blue", en: "Wave Ride", cn: "千草", img: "miemiefur/waveride.png" }, 17, 181, 215],
+	[{ group: "Blue", en: "Tiles", cn: "瓦青", img: "miemiefur/tiles.png" }, 0, 143, 202],
+	[{ group: "Blue", en: "Cyan", cn: "氰蓝", img: "miemiefur/cyan.png" }, 20, 106, 180],
+	[{ group: "Blue", en: "Lapis Lazuli", cn: "青金石", img: "miemiefur/lapislazuli.png" }, 21, 83, 165],
+	[{ group: "Blue", en: "Midnight Blue", cn: "夜蓝", img: "miemiefur/midnightblue.png" }, 28, 55, 93],
+	[{ group: "Blue", en: "Indigo", cn: "渡蓝", img: "miemiefur/indigo.png" }, 31, 67, 136],
+	[{ group: "Blue", en: "Amparo", cn: "帕罗蓝", img: "miemiefur/amparo.png" }, 58, 98, 174],
+	[{ group: "Blue", en: "Aqua Gleam", cn: "海蓝", img: "miemiefur/aquagleam.png" }, 145, 214, 221],
+	[{ group: "Blue", en: "Horizon Blue", cn: "路蓝", img: "miemiefur/horizonblue.png" }, 189, 210, 233],
+	[{ group: "Blue", en: "Sapphire Smoke", cn: "蓝石", img: "miemiefur/sapphiresmoke.png" }, 121, 150, 191],
+	[{ group: "Blue", en: "Serene Blue", cn: "谧蓝", img: "miemiefur/sereneblue.png" }, 114, 133, 165],
 
 	// Purple
-	[{ group: "Purple", en: "Tipsy", cn: "微醺" }, 166, 171, 214],
-	[{ group: "Purple", en: "Hongbi", cn: "红碧" }, 157, 160, 207],
-	[{ group: "Purple", en: "Hibiscus Purple", cn: "槿紫" }, 129, 110, 161],
-	[{ group: "Purple", en: "Rapids", cn: "泷" }, 63, 38, 103],
-	[{ group: "Purple", en: "Iris", cn: "虹膜" }, 161, 99, 169],
-	[{ group: "Purple", en: "Platycodon", cn: "桔梗" }, 73, 58, 150],
-	[{ group: "Purple", en: "Amethyst", cn: "紫晶" }, 87, 40, 112],
-	[{ group: "Purple", en: "Phalaenopsis (COMING SOON)", cn: "蝴蝶兰 (COMING SOON)" }, 219, 157, 254],
-	[{ group: "Purple", en: "Twilight Bloom (COMING SOON)", cn: "暮紫 (COMING SOON)" }, 53, 13, 102],
-    ];
+	[{ group: "Purple", en: "Tipsy", cn: "微醺", img: "miemiefur/tipsy.png" }, 166, 171, 214],
+	[{ group: "Purple", en: "Hongbi", cn: "红碧", img: "miemiefur/hongbi.png" }, 157, 160, 207],
+	[{ group: "Purple", en: "Hibiscus Purple", cn: "槿紫", img: "miemiefur/hibiscuspurple.png" }, 129, 110, 161],
+	[{ group: "Purple", en: "Rapids", cn: "泷", img: "miemiefur/rapids.png" }, 63, 38, 103],
+	[{ group: "Purple", en: "Iris", cn: "虹膜", img: "miemiefur/iris.png" }, 161, 99, 169],
+	[{ group: "Purple", en: "Platycodon", cn: "桔梗", img: "miemiefur/platycodon.png" }, 73, 58, 150],
+	[{ group: "Purple", en: "Amethyst", cn: "紫晶", img: "miemiefur/amethyst.png" }, 87, 40, 112],
+	[{ group: "Purple", en: "Phalaenopsis", cn: "蝴蝶兰", img: "miemiefur/phalaenopsis.png" }, 219, 157, 254],
+	[{ group: "Purple", en: "Twilight Bloom", cn: "暮紫", img: "miemiefur/twilightbloom.png" }, 53, 13, 102],
+];
 
 	const MIEMIEFUR_COLOURS_LAB = MIEMIEFUR_COLOURS.map(([meta, r, g, b]) => {
 		return {
@@ -630,7 +642,8 @@
 			r,
 			g,
 			b,
-			lab: rgbToLab(r, g, b)
+			lab: rgbToLab(r, g, b),
+			img: meta.img || null,
 		};
 	});
 
@@ -702,14 +715,17 @@
 	  matchSwatch.style.background = rgbToHex(match.r, match.g, match.b);
 	  matchInfo.textContent =
 	    languageMode === "en" ? match.meta.en : match.meta.cn;
+		document.getElementById("matchImg").src = match.img || ""; 
 
 	  runner1Swatch.style.background = rgbToHex(runner1.r, runner1.g, runner1.b);
 	  runner1Info.textContent =
 	    languageMode === "en" ? runner1.meta.en : runner1.meta.cn;
+		document.getElementById("runner1Img").src = runner1.img || "";
 
 	  runner2Swatch.style.background = rgbToHex(runner2.r, runner2.g, runner2.b);
 	  runner2Info.textContent =
 	    languageMode === "en" ? runner2.meta.en : runner2.meta.cn;
+		document.getElementById("runner2Img").src = runner2.img || "";
 	});
 
 	const magnifier = document.getElementById("magnifier");
@@ -940,6 +956,7 @@
 		    r: col.r,
 		    g: col.g,
 		    b: col.b,
+			img: col.img,
 		    distance: dist
 		  });
 	}
@@ -1028,7 +1045,6 @@
 
 	const emoji = groupEmojiMap[col.meta.group] || "";
 	const name = (languageMode === "en" ? col.meta.en : col.meta.cn)
-	  .replace(" (COMING SOON)", "<br>(COMING SOON)");
 
 	item.innerHTML = `
 	  <div class="saved-swatch" style="background:${col.hex}"></div>
