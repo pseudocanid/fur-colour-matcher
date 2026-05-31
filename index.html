@@ -221,15 +221,21 @@
     }
 
     .swatch {
-      width: 100%;
-      height: 80px;
-      border-radius: 12px;
-      border: 3px solid rgba(255,255,255,0.2);
-      transition: all 0.3s;
+		position: absolute;
+	  bottom: 6px;
+	  right: 6px;
+	  width: 38px;
+	  height: 38px;
+	  border-radius: 8px;
+	  border: 2px solid rgba(255,255,255,0.35);
+	  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+
+  z-index: 2;
     }
 
 	.swatch-box {
 	  position: relative;
+	  width: 100%;
 	}
 
 	.star-btn {
@@ -260,10 +266,10 @@
 
 	.match-img {
 	  width: 100%;
-	  height: 80px;
+	  aspect-ratio: 1 / 1;
 	  object-fit: cover;
 	  border-radius: 12px;
-	  margin-bottom: 6px;
+	  display: block;
 	  border: 2px solid rgba(255,255,255,0.15);
 	}
 
@@ -472,7 +478,9 @@
       <div class="color-display">
         <div class="color-box">
           <label>Picked</label>
-          <div id="pickedSwatch" class="swatch" style="background: #444"></div>
+		  <div class="swatch-box">
+			<div id="pickedSwatch" class="match-img"></div>
+		  </div>
           <div id="pickedInfo" class="color-info">Click anywhere on image to pick a colour</div>
         </div>
 
@@ -480,7 +488,7 @@
 	  <label>Closest Match</label>
 	 <div class="swatch-box">
 		<img id="matchImg" class="match-img" />
-	    <div id="matchSwatch" class="swatch" style="background: #444"></div>
+	    <div id="matchSwatch" class="swatch"></div>
 	    <button class="star-btn" data-target="match">⭐</button>
 	  </div>
 	  <div id="matchInfo" class="color-info">—</div>
@@ -495,7 +503,7 @@
 	    <div style="flex:1; text-align:center;">
 			<div class="swatch-box">
 				<img id="runner1Img" class="match-img" />
-				<div id="runner1Swatch" class="swatch" style="height:60px;"></div>
+				<div id="runner1Swatch" class="swatch"></div>
 		  		<button class="star-btn" data-target="r1">⭐</button>
 				</div>
 	      <div id="runner1Info" class="color-info">—</div>
@@ -504,7 +512,7 @@
 	    <div style="flex:1; text-align:center;">
 		<div class="swatch-box">
 			<img id="runner2Img" class="match-img" />
-			<div id="runner2Swatch" class="swatch" style="height:60px;"></div>
+			<div id="runner2Swatch" class="swatch"></div>
 			<button class="star-btn" data-target="r2">⭐</button>
 		</div>
 	      <div id="runner2Info" class="color-info">—</div>
