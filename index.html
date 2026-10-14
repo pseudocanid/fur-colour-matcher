@@ -491,7 +491,7 @@
 	<div class="color-box">
 	  <label>Closest Match</label>
 	 <div class="swatch-box">
-		<img id="matchImg" class="match-img" />
+		<img id="matchImg" class="match-img" loading="eager" decoding="async" fetchpriority="high" />
 	    <div id="matchSwatch" class="swatch"></div>
 	    <button class="star-btn" data-target="match">⭐</button>
 	  </div>
@@ -506,7 +506,7 @@
 	  <div style="display:flex; gap:12px;">
 	    <div style="flex:1; text-align:center;">
 			<div class="swatch-box">
-				<img id="runner1Img" class="match-img" />
+				<img id="runner1Img" class="match-img" loading="eager" decoding="async" />
 				<div id="runner1Swatch" class="swatch"></div>
 		  		<button class="star-btn" data-target="r1">⭐</button>
 				</div>
@@ -515,7 +515,7 @@
 	
 	    <div style="flex:1; text-align:center;">
 		<div class="swatch-box">
-			<img id="runner2Img" class="match-img" />
+			<img id="runner2Img" class="match-img" loading="eager" decoding="async" />
 			<div id="runner2Swatch" class="swatch"></div>
 			<button class="star-btn" data-target="r2">⭐</button>
 		</div>
