@@ -869,62 +869,82 @@
 			return;
 		}
 
-		const cols = 3;
-		const size = 500;
-		const textHeight = 80;
+		const originalLabel = exportSavedBtn.textContent;
+		exportSavedBtn.disabled = true;
+		exportSavedBtn.textContent = "⏳ Preparing export...";
 
-		const rows = Math.ceil(saved.length / cols);
+		try {
+			const cols = 3;
+			const size = 500;
+			const textHeight = 80;
 
-		const exportCanvas = document.createElement("canvas");
-		const ctx = exportCanvas.getContext("2d");
+			const rows = Math.ceil(saved.length / cols);
 
-		exportCanvas.width = cols * size;
-		exportCanvas.height = rows * (size + textHeight);
+			const exportCanvas = document.createElement("canvas");
+			const ctx = exportCanvas.getContext("2d");
 
-		ctx.fillStyle = "#1a1a2e";
-		ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+			exportCanvas.width = cols * size;
+			exportCanvas.height = rows * (size + textHeight);
 
-		ctx.textAlign = "center";
-		ctx.fillStyle = "#fff";
+			ctx.fillStyle = "#1a1a2e";
+			ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
 
-		const loadImage = (src) =>
-			new Promise((resolve, reject) => {
-			const img = new Image();
-			img.onload = () => resolve(img);
-			img.onerror = reject;
-			img.src = src;
+			ctx.textAlign = "center";
+			ctx.fillStyle = "#fff";
+
+			const loadImage = (src) =>
+				new Promise((resolve, reject) => {
+					const img = new Image();
+					img.onload = () => resolve(img);
+					img.onerror = reject;
+					img.src = src;
+				});
+
+			const images = await Promise.all(saved.map(c => loadImage(c.meta.img)));
+
+			for (let i = 0; i < saved.length; i++) {
+				const col = saved[i];
+				const img = images[i];
+
+				const x = (i % cols) * size;
+				const y = Math.floor(i / cols) * (size + textHeight);
+
+				ctx.drawImage(img, x, y, size, size);
+
+				const name = languageMode === "en" ? col.meta.en : col.meta.cn;
+				const group = groupLabelMap[col.meta.group] || col.meta.group;
+
+				// main title (fur colour)
+				ctx.font = "30px system-ui";
+				ctx.fillText(name, x + size / 2, y + size + 40);
+
+				// category (ex. greens)
+				ctx.font = "15px system-ui";
+				ctx.fillText(`Miemiefur ${group}`, x + size / 2, y + size + 60);
+			}
+
+			const blob = await new Promise((resolve, reject) => {
+				exportCanvas.toBlob(
+					(b) => (b ? resolve(b) : reject(new Error("toBlob returned null"))),
+					"image/png"
+				);
 			});
 
-		for (let i = 0; i < saved.length; i++) {
-			const col = saved[i];
-
-			const img = await loadImage(col.meta.img);
-
-			const x = (i % cols) * size;
-			const y = Math.floor(i / cols) * (size + textHeight);
-
-			ctx.drawImage(img, x, y, size, size);
-
-			const name = languageMode === "en" ? col.meta.en : col.meta.cn;
-			const group = groupLabelMap[col.meta.group] || col.meta.group;
-
-			// main title (fur colour)
-			ctx.font = "30px system-ui";
-			ctx.fillText(name, x + size / 2, y + size + 40);
-
-			// category (ex. greens)
-			ctx.font = "15px system-ui";
-			ctx.fillText(`Miemiefur ${group}`, x + size / 2, y + size + 60);
-		}
-
-		exportCanvas.toBlob((blob) => {
 			const url = URL.createObjectURL(blob);
 			const a = document.createElement("a");
 			a.href = url;
 			a.download = "shrinebeasts-fur-colour-matcher.png";
 			a.click();
 			URL.revokeObjectURL(url);
-		});
+
+			showToast("Export downloaded ✔");
+		} catch (err) {
+			console.error("Export failed:", err);
+			alert("Export failed. Please try again.");
+		} finally {
+			exportSavedBtn.disabled = false;
+			exportSavedBtn.textContent = originalLabel;
+		}
 	};
 
 	let matches = [];
