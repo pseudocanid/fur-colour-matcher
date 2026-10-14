@@ -10,6 +10,7 @@ Known Bugs:
 Planned Tools:
 - Merge, or allow txt import to my Fursona Recolour project. Choose which colours on the ref sheet will be recoloured by the fur colours, then perform automatically (and change colour distance algorithm to LAB).
 
-Added May 2026
-- Preview photo with fur swatch from listing by splitting the 'best match' and 'other matches' field in half
-- Change export to export a collage img of the matching furs
+Added October 2026
+- All colours are now up to date
+- Added thumbnails (faster loading times)
+- Improved RGB values for colours
