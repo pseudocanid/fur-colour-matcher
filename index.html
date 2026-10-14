@@ -665,6 +665,17 @@
 		};
 	});
 
+	// Preload all thumbnails once the page has finished loading
+	const preloadedThumbs = [];
+	window.addEventListener("load", () => {
+	  MIEMIEFUR_COLOURS.forEach(([meta]) => {
+	    const i = new Image();
+	    i.fetchPriority = "low";
+	    i.src = meta.preview;
+	    preloadedThumbs.push(i);
+	  });
+	});
+
 	const groupLabelMap = {
 	"White & Black": "White & Black",
 	"Brown": "Browns",
